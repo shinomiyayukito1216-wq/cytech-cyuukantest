@@ -1,0 +1,38 @@
+@charset "UTF-8";
+
+/* 全体の基本スタイル */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+/* レイアウト構成 */
+.container {
+    display: flex;
+    margin: 20px;
+}
+
+aside {
+    width: 200px;
+    margin-right: 20px;
+}
+
+main {
+    flex: 1;
+}
+
+/* テーブルスタイル */
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 8px;
+}
+
+/* フッタースタイル */
+footer {
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
