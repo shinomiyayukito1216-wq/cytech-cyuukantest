@@ -5,12 +5,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// POSTメソッドで送信されたデータを受け取る
-$name        = $_POST['name'] ?? '';
-$companyName = $_POST['companyName'] ?? '';
-$email       = $_POST['email'] ?? '';
-$age         = $_POST['age'] ?? '';
-$message     = $_POST['message'] ?? '';
+// POSTデータ受取
+$name        = trim($_POST['name'] ?? '');
+$companyName = trim($_POST['companyName'] ?? '');
+$email       = trim($_POST['email'] ?? '');
+$age         = trim($_POST['age'] ?? '');
+$message     = trim($_POST['message'] ?? '');
+
+// サーバ側セキュリティ・未入力ガード（空欄がある場合は contact.php へ押し戻す）
+if ($name === '' || $companyName === '' || $email === '' || $age === '' || $message === '') {
+    header('Location: contact.php');
+    exit;
+}
 
 // メール送信設定
 mb_language("Japanese");
@@ -27,7 +33,7 @@ $body .= "お問い合わせ内容 : \n" . $message . "\n";
 
 $headers = "From: " . $email;
 
-// メール送信実行（戻り値で成功・失敗を判定）
+// メール送信実行
 $isSuccess = mb_send_mail($to, $subject, $body, $headers);
 ?>
 <!DOCTYPE html>

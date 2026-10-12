@@ -1,16 +1,29 @@
 <?php
-// POSTメソッド以外からのアクセスは contact.php へリダイレクト
+// 要件 c) POSTメソッド以外での直接アクセスは contact.php へリダイレクト
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: contact.php');
     exit;
 }
 
-// POSTメソッドで送信されたデータを受け取る
+// 要件 a) POSTデータを受け取る
 $name        = $_POST['name'] ?? '';
 $companyName = $_POST['companyName'] ?? '';
 $email       = $_POST['email'] ?? '';
 $age         = $_POST['age'] ?? '';
 $message     = $_POST['message'] ?? '';
+
+// 前後の空白を除去
+$name        = trim($name);
+$companyName = trim($companyName);
+$email       = trim($email);
+$age         = trim($age);
+$message     = trim($message);
+
+// 設問7 要件b) PHP側での未入力チェック（1つでも空欄があればエラーフラグを立てる）
+$errors = [];
+if ($name === '' || $companyName === '' || $email === '' || $age === '' || $message === '') {
+    $errors[] = "必須項目が未入力です。入力内容をご確認ください。";
+}
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -39,41 +52,51 @@ $message     = $_POST['message'] ?? '';
 
         <!-- メイン部分 -->
         <main>
-            <form action="send.php" method="POST">
-                <!-- データを hidden フィールドを使って send.php に渡す準備 -->
-                <input type="hidden" name="name" value="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>">
-                <input type="hidden" name="companyName" value="<?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?>">
-                <input type="hidden" name="email" value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>">
-                <input type="hidden" name="age" value="<?php echo htmlspecialchars($age, ENT_QUOTES, 'UTF-8'); ?>">
-                <input type="hidden" name="message" value="<?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?>">
-
-                <!-- 受け取ったデータをテーブル形式で表示（特殊文字をエスケープ） -->
-                <table border="3">
-                    <tr>
-                        <th>お名前</th>
-                        <td><?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?></td>
-                    </tr>
-                    <tr>
-                        <th>会社名</th>
-                        <td><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></td>
-                    </tr>
-                    <tr>
-                        <th>メールアドレス</th>
-                        <td><?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?></td>
-                    </tr>
-                    <tr>
-                        <th>年齢</th>
-                        <td><?php echo htmlspecialchars($age, ENT_QUOTES, 'UTF-8'); ?></td>
-                    </tr>
-                    <tr>
-                        <th>お問い合わせ内容</th>
-                        <td><?php echo nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')); ?></td>
-                    </tr>
-                </table>
-                <br>
+            <?php if (!empty($errors)): ?>
+                <!-- 設問7 要件b) 入力漏れがある場合のエラー表示 -->
+                <div style="color: red; margin-bottom: 20px;">
+                    <?php foreach ($errors as $error): ?>
+                        <p><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <?php endforeach; ?>
+                </div>
                 <input type="button" value="戻る" onclick="history.back();">
-                <input type="submit" value="送信">
-            </form>
+            <?php else: ?>
+                <!-- 正しく入力されている場合のみフォームを表示 -->
+                <form action="send.php" method="POST">
+                    <!-- データを hidden フィールドで send.php に渡す -->
+                    <input type="hidden" name="name" value="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="companyName" value="<?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="email" value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="age" value="<?php echo htmlspecialchars($age, ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="message" value="<?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?>">
+
+                    <table border="3">
+                        <tr>
+                            <th>お名前</th>
+                            <td><?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?></td>
+                        </tr>
+                        <tr>
+                            <th>会社名</th>
+                            <td><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></td>
+                        </tr>
+                        <tr>
+                            <th>メールアドレス</th>
+                            <td><?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?></td>
+                        </tr>
+                        <tr>
+                            <th>年齢</th>
+                            <td><?php echo htmlspecialchars($age, ENT_QUOTES, 'UTF-8'); ?></td>
+                        </tr>
+                        <tr>
+                            <th>お問い合わせ内容</th>
+                            <td><?php echo nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')); ?></td>
+                        </tr>
+                    </table>
+                    <br>
+                    <input type="button" value="戻る" onclick="history.back();">
+                    <input type="submit" value="送信">
+                </form>
+            <?php endif; ?>
         </main>
     </div>
 
